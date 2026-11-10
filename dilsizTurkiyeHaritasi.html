@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Türkiye Haritası Boyama ve İşaretleme</title>
+
+  <style>
+    :root { 
+      --ink: #173047; 
+      --paper: #f6f3eb; 
+      --line: #dce2df; 
+      --accent: #d22828; 
+      --vector: #10b981;
+    }
+    
+    * { box-sizing: border-box; }
+
+    body, input, button, select, text { 
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; 
+    }
+    
+    body { margin:0; padding:12px; color:var(--ink); background:var(--paper); }
+    @media (min-width: 640px) { body { padding:24px; } }
+
+    .app-container { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+    /* Header */
+    header { 
+      display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 12px; 
+      border-bottom: 1px solid var(--line); padding-bottom: 12px; 
+    }
+    @media (min-width: 640px) { header { flex-direction: row; align-items: center; } }
+    .header-title { font-size: 1.25rem; font-weight: 700; margin: 0; }
+    @media (min-width: 640px) { .header-title { font-size: 1.5rem; } }
+    .badge { background: #ffffff; padding: 8px 16px; border-radius: 12px; border: 1px solid var(--line); font-size: 0.875rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+    /* Harita Çerçevesi */
+    .map-frame { height:560px; background:#ffffff; border-radius:1rem; border:1px solid var(--line); position: relative; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    #svg-container { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+    svg { width:100%; height:100%; display:block; }
+    path { transition: fill 0.15s ease; stroke-linejoin: round; stroke-linecap: round; }
+
+    /* Zoom Butonları */
+    .zoom-controls { position: absolute; top: 12px; left: 12px; z-index: 10; display: flex; flex-direction: column; gap: 4px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .zoom-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; background: none; border: none; cursor: pointer; border-radius: 4px; color: var(--ink); font-size: 1rem; }
+    .zoom-btn:hover { background: #f3f4f6; }
+    .zoom-divider { border: 0; border-top: 1px solid #e5e7eb; margin: 0; }
+
+    /* Tooltip & Loading */
+    #tooltip { position: absolute; pointer-events: none; background: rgba(23, 48, 71, 0.9); color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; display: none; z-index: 2000; }
+    #loading { position: absolute; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; z-index: 1001; border-radius: 1rem; }
+    .hidden { display: none !important; }
+
+    /* Kontrol Panelleri Grid */
+    .control-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 768px) { .control-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .card { background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; height: 100%; }
+    .card-title { font-weight: 700; font-size: 0.875rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin: 0; }
+
+    /* Form Elemanları */
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .label-text { font-size: 11px; font-weight: 600; color: #4b5563; }
+    
+    input[type="text"], input[type="number"], input[type="search"] {
+      width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 8px; font-size: 12px; outline: none;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, input[type="search"]:focus { border-color: var(--accent); }
+    input[type="color"] { width: 100%; height: 28px; border-radius: 4px; border: 1px solid #d1d5db; padding: 2px; cursor: pointer; background: #fff; }
+
+    .btn { padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; border: 1px solid #d1d5db; cursor: pointer; transition: opacity 0.15s; background: #f3f4f6; color: #374151; }
+    .btn:hover { background: #e5e7eb; }
+    .btn-primary { background: var(--ink); color: #ffffff; border: none; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-danger { background: var(--accent); color: #ffffff; border: none; }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-vector { background: var(--vector); color: #ffffff; border: none; }
+    .btn-vector:hover { opacity: 0.9; }
+
+    .roman-container { display: flex; flex-wrap: wrap; gap: 4px; }
+    .quick-roman { padding: 2px 8px; font-size: 12px; font-weight: bold; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; cursor: pointer; }
+    .quick-roman:hover { background: #e5e7eb; }
+
+    .separator { border-top: 1px solid #e5e7eb; padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+    .section-subtitle { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; }
+
+    /* İL LİSTESİ YÜKSEKLİK DÜZELTMESİ */
+    .province-list-card { display: flex; flex-direction: column; height: 100%; }
+    #province-list { flex: 1; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 4px; margin-top: 4px; }
+    .province-row { width: 100%; text-align: left; padding: 6px 12px; border-radius: 6px; border: 1px solid #e5e7eb; font-size: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #fff; }
+    .province-row.is-selected { border-color: var(--accent); background: #fde8e8; }
+    .province-color-indicator { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15); display: inline-block; }
+
+    /* Kullanım Rehberi Alanı */
+    .guide-section { background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .guide-title { font-size: 1rem; font-weight: 700; margin-top: 0; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
+    .guide-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 768px) { .guide-grid { grid-template-columns: repeat(4, 1fr); } }
+    .guide-block { display: flex; flex-direction: column; gap: 6px; }
+    .guide-block h3 { font-size: 0.813rem; font-weight: 700; color: var(--ink); margin: 0; }
+    .guide-block ul { margin: 0; padding-left: 16px; font-size: 11px; color: #4b5563; line-height: 1.5; }
+    .guide-block li { margin-bottom: 3px; }
+
+    /* Footer */
+    footer { background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+    /* SVG Etiket & Şekil Stilleri */
+    .svg-interactive { cursor: move; user-select: none; }
+    .svg-interactive:hover { opacity: 0.8; stroke-dasharray: 2 2; }
+    .auto-province-name { user-select: none; font-weight: 700; cursor: move; }
+    .auto-province-name:hover { opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <div id="tooltip"></div>
+  <div class="app-container">
+    
+    <!-- Header -->
+    <header>
+      <div>
+        <h1 class="header-title">Türkiye İller Haritası ve Materyal Hazırlayıcı</h1>
+      </div>
+      <div class="badge">
+        Seçilen İl Sayısı: <strong id="selected-count" style="font-size: 1.125rem; color: var(--accent);">0</strong> / 81
+      </div>
+    </header>
+
+    <!-- 1. ÜST KISIM: Harita -->
+    <main>
+      <div class="map-frame" id="map-frame">
+        <div class="zoom-controls">
+          <button id="zoom-in" type="button" class="zoom-btn">+</button>
+          <hr class="zoom-divider">
+          <button id="zoom-out" type="button" class="zoom-btn">-</button>
+          <hr class="zoom-divider">
+          <button id="zoom-reset" type="button" title="Sıfırla" class="zoom-btn" style="font-size: 12px;">⟲</button>
+        </div>
+
+        <div id="svg-container"></div>
+
+        <div id="loading">
+          Harita Yükleniyor...
+        </div>
+      </div>
+    </main>
+
+    <!-- 2. ORTA KISIM: Kontrol Panelleri -->
+    <section class="control-grid">
+      
+      <!-- Metin / Etiket Ayarları Paneli -->
+      <div class="card">
+        <h2 class="card-title">Metin & Romen Rakamı</h2>
+        
+        <div style="display: flex; gap: 8px;">
+          <input id="label-input" type="text" placeholder="I, A, 1">
+          <button id="add-label-btn" class="btn btn-primary" style="white-space: nowrap;">Ekle</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="label-text">Boyut</label>
+            <input id="label-size" type="number" value="14" min="6" max="40" style="text-align: center;">
+          </div>
+          <div class="form-group">
+            <label class="label-text">Renk</label>
+            <input id="label-color" type="color" value="#000000">
+          </div>
+        </div>
+
+        <div class="roman-container">
+          <button class="quick-roman">I</button>
+          <button class="quick-roman">II</button>
+          <button class="quick-roman">III</button>
+          <button class="quick-roman">IV</button>
+          <button class="quick-roman">V</button>
+        </div>
+      </div>
+
+      <!-- Şekil / Nokta İşaretleme Paneli -->
+      <div class="card">
+        <h2 class="card-title">Şekil & İşaret Ekle</h2>
+        
+        <div class="grid-2">
+          <button id="add-dot-btn" class="btn">● Dolu Daire</button>
+          <button id="add-triangle-btn" class="btn">▲ Üçgen</button>
+          <button id="add-square-btn" class="btn">■ Kare</button>
+          <button id="add-pentagon-btn" class="btn">⬟ Beşgen</button>
+          <button id="add-ellipse-btn" class="btn">⬏ Yatay Elips</button>
+          <button id="add-star-btn" class="btn">★ Yıldız</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="label-text">Şekil Rengi</label>
+            <input id="shape-color" type="color" value="#d22828">
+          </div>
+          <div class="form-group">
+            <label class="label-text">Şekil Boyutu</label>
+            <input id="shape-size" type="number" value="14" min="4" max="80" style="text-align: center;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Renk Paleti ve Görünürlük Kontrolleri -->
+      <div class="card">
+        <h2 class="card-title">Renk & Görünürlük</h2>
+        
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="label-text">Varsayılan İl</label>
+            <input id="base-color" type="color" value="#cccccc">
+          </div>
+          <div class="form-group">
+            <label class="label-text">Seçili İl Rengi</label>
+            <input id="selected-color" type="color" value="#d22828">
+          </div>
+        </div>
+
+        <div class="separator">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <button id="toggle-boundaries" class="btn" style="width: 100%;">
+              Sınırları Gizle
+            </button>
+            <input id="boundary-color" type="color" value="#000000" style="width: 40px; shrink: 0;">
+          </div>
+
+          <div class="separator">
+            <span class="section-subtitle">İl İsim Ayarları</span>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 6px; align-items: center;">
+              <button id="toggle-province-names" class="btn btn-primary">
+                İl İsimlerini Göster
+              </button>
+              <input id="province-name-color" type="color" value="#173047" title="İsim Rengi">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <label class="label-text">Yazı Boyutu (Punto):</label>
+              <input id="province-name-size" type="number" value="12" min="6" max="30" style="width: 56px; text-align: center; font-weight: bold;">
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- İl Arama ve Liste -->
+      <div class="card province-list-card">
+        <h2 class="card-title">İl Listesi</h2>
+        <input id="search-input" type="search" placeholder="İl ara...">
+        <div id="province-list"></div>
+      </div>
+
+    </section>
+
+    <!-- KULLANIM REHBERİ ALANI -->
+    <section class="guide-section">
+      <h2 class="guide-title">📌 Kullanım Rehberi ve İpuçları</h2>
+      <div class="guide-grid">
+        
+        <div class="guide-block">
+          <h3>1. Metin & Romen Rakamı</h3>
+          <ul>
+            <li>İstediğiniz metni, harfi veya Romen rakamını kutuya yazıp <strong>Ekle</strong> butonuna basın.</li>
+            <li>Eklenen metin haritanın ortasında belirir; fareyle tutup istediğiniz konuma sürükleyebilirsiniz.</li>
+            <li>Yazı boyutunu ve rengini eklemeden önce özelleştirebilirsiniz.</li>
+            <li>Ekrandan kaldırmak istediğiniz metnin üzerine <strong>çift tıklamanız</strong> yeterlidir.</li>
+          </ul>
+        </div>
+
+        <div class="guide-block">
+          <h3>2. Şekil & İşaret Ekle</h3>
+          <ul>
+            <li>Daire, üçgen, kare, beşgen, elips veya yıldız butonlarına basarak haritaya simge ekleyebilirsiniz.</li>
+            <li>Tüm şekiller fareyle harita üzerinde istenen şehre veya bölgeye kolayca sürüklenebilir.</li>
+            <li>Şekil rengini ve boyutunu paneldeki ayar kutularından değiştirebilirsiniz.</li>
+            <li>Yanlış eklenen veya fazla olan şekilleri silmek için üzerine <strong>çift tıklayın</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="guide-block">
+          <h3>3. Renk & Görünürlük</h3>
+          <ul>
+            <li><strong>Varsayılan İl:</strong> Seçilmemiş tüm illerin temel rengini değiştirir.</li>
+            <li><strong>Seçili İl Rengi:</strong> Tıklayacağınız illerin boyanacağı rengi belirler.</li>
+            <li><strong>Sınır Çizgileri:</strong> Sınırları gizleyebilir veya çizgi rengini değiştirebilirsiniz.</li>
+            <li><strong>İl İsimleri:</strong> Tüm il isimlerini açabilir, renklerini ve punto boyutlarını ayarlayabilirsiniz. Açılan isimler sürüklenebilir.</li>
+          </ul>
+        </div>
+
+        <div class="guide-block">
+          <h3>4. İl Seçimi & İndirme</h3>
+          <ul>
+            <li>İlleri doğrudan harita üzerinden veya <strong>İl Listesi</strong> arama kutusundan seçip renklendirebilirsiniz.</li>
+            <li><strong>Çıktı Genişliği:</strong> Baskı büyüklüğünü (cm) girerek çözünürlüğü belirleyebilirsiniz.</li>
+            <li><strong>SVG (Vektör):</strong> Adobe Illustrator / InDesign'da katman katman düzenlemek için vektörel indirir.</li>
+            <li><strong>PNG / JPEG:</strong> Sunumlar ve sınav kağıtları için yüksek çözünürlüklü görsel çıktısı verir.</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. ALT KISIM: İndirme ve Genişlik Kontrolleri -->
+    <footer>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <label for="export-width" style="font-size: 12px; font-weight: 600;">Çıktı Genişliği (cm):</label>
+        <input id="export-width" type="number" placeholder="7" min="2" max="200" style="width: 64px; text-align: center;">
+        <span style="font-size: 12px; color: #6b7280;">(Boş kalırsa varsayılan: 7 cm)</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="download-svg" class="btn btn-vector" style="padding: 10px 20px;">SVG (Vektör) İndir</button>
+        <button id="download-png" class="btn btn-danger" style="padding: 10px 20px;">PNG İndir</button>
+        <button id="download-jpeg" class="btn btn-primary" style="padding: 10px 20px;">JPEG İndir</button>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const basePicker = document.getElementById("base-color");
+    const selectedPicker = document.getElementById("selected-color");
+    const boundaryPicker = document.getElementById("boundary-color");
+    const nameColorPicker = document.getElementById("province-name-color");
+    const nameSizeInput = document.getElementById("province-name-size");
+    const toggleBoundaryBtn = document.getElementById("toggle-boundaries");
+    const toggleNamesBtn = document.getElementById("toggle-province-names");
+    const listContainer = document.getElementById("province-list");
+    const countDisplay = document.getElementById("selected-count");
+    const tooltip = document.getElementById("tooltip");
+    const container = document.getElementById("svg-container");
+
+    const labelSizeInput = document.getElementById("label-size");
+    const labelColorPicker = document.getElementById("label-color");
+    const shapeSizeInput = document.getElementById("shape-size");
+    const shapeColorPicker = document.getElementById("shape-color");
+
+    let showBoundaries = true;
+    let showProvinceNames = false;
+    
+    // Her ilin kendi rengini saklayan Harita (İl Key -> Renk Kodu)
+    const selectedProvinceColors = new Map();
+    const provinceMap = new Map();
+
+    let svgElement = null;
+    let pathGroup = null;
+    let autoNamesGroup = null;
+    let labelGroup = null;
+
+    let initialViewBox = { x: 0, y: 0, w: 1000, h: 500 };
+    let currentViewBox = { ...initialViewBox };
+
+    const trKey = str => String(str || "").toLocaleLowerCase("tr-TR").trim();
+
+    const PROVINCE_OFFSETS = {
+      "antalya": { dx: 45, dy: -20 },
+      "izmir": { dx: 32, dy: 5 },
+      "balıkesir": { dx: 35, dy: 15 },
+      "çanakkale": { dx: 50, dy: 25 },
+      "muğla": { dx: 38, dy: -12 },
+      "istanbul": { dx: 0, dy: 8 },
+      "zonguldak": { dx: 0, dy: 10 },
+      "edirne": { dx: 15, dy: 0 },
+      "kırklareli": { dx: 10, dy: 0 }
+    };
+
+    function getVisualCenter(key, geometry) {
+      let targetPolygon = geometry.coordinates;
+      if (geometry.type === "MultiPolygon") {
+        let maxArea = 0;
+        geometry.coordinates.forEach(poly => {
+          let pts = poly[0];
+          let area = 0;
+          for (let i = 0; i < pts.length - 1; i++) {
+            area += pts[i][0] * pts[i+1][1] - pts[i+1][0] * pts[i][1];
+          }
+          area = Math.abs(area) / 2;
+          if (area > maxArea) {
+            maxArea = area;
+            targetPolygon = [poly[0]];
+          }
+        });
+      }
+
+      let totalX = 0, totalY = 0, count = 0;
+      targetPolygon[0].forEach(coord => {
+        totalX += (coord[0] - 25.5) * 52;
+        totalY += (42.5 - coord[1]) * 65;
+        count++;
+      });
+
+      let cx = totalX / count;
+      let cy = totalY / count;
+
+      if (PROVINCE_OFFSETS[key]) {
+        cx += PROVINCE_OFFSETS[key].dx;
+        cy += PROVINCE_OFFSETS[key].dy;
+      }
+
+      return { x: cx, y: cy };
+    }
+
+    function geoJsonToSvgPath(geometry) {
+      let d = "";
+      const coords = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
+      coords.forEach(polygon => {
+        polygon.forEach(ring => {
+          ring.forEach((coord, i) => {
+            const x = (coord[0] - 25.5) * 52;
+            const y = (42.5 - coord[1]) * 65;
+            d += i === 0 ? `M ${x.toFixed(2)} ${y.toFixed(2)}` : ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
+          });
+          d += " Z ";
+        });
+      });
+      return d;
+    }
+
+    function updateStyles() {
+      if (!svgElement) return;
+
+      provinceMap.forEach((entry, key) => {
+        const isSelected = selectedProvinceColors.has(key);
+        const fillColor = isSelected ? selectedProvinceColors.get(key) : basePicker.value;
+
+        entry.path.setAttribute("fill", fillColor);
+        
+        if (showBoundaries) {
+          entry.path.setAttribute("stroke", boundaryPicker.value);
+          entry.path.setAttribute("stroke-width", "1.2");
+        } else {
+          entry.path.setAttribute("stroke", fillColor);
+          entry.path.setAttribute("stroke-width", "0.8");
+        }
+
+        entry.button.classList.toggle("is-selected", isSelected);
+        const indicator = entry.button.querySelector(".province-color-indicator");
+        if (indicator) {
+          indicator.style.background = fillColor;
+        }
+      });
+
+      if (autoNamesGroup) {
+        const fontSize = nameSizeInput.value || 12;
+        autoNamesGroup.querySelectorAll(".auto-province-name").forEach(el => {
+          el.setAttribute("fill", nameColorPicker.value);
+          el.setAttribute("font-size", fontSize);
+        });
+      }
+
+      countDisplay.textContent = selectedProvinceColors.size;
+    }
+
+    function toggleProvince(key) {
+      if (selectedProvinceColors.has(key)) {
+        selectedProvinceColors.delete(key);
+      } else {
+        selectedProvinceColors.set(key, selectedPicker.value);
+      }
+      updateStyles();
+    }
+
+    async function initMap() {
+      try {
+        const res = await fetch("https://raw.githubusercontent.com/cihadturhan/tr-geojson/master/geo/tr-cities-utf8.json");
+        if (!res.ok) throw new Error("GeoJSON çekilemedi.");
+        const data = await res.json();
+
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svgElement = svg;
+
+        pathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        svg.appendChild(pathGroup);
+
+        autoNamesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        autoNamesGroup.style.display = "none";
+        svg.appendChild(autoNamesGroup);
+
+        labelGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        svg.appendChild(labelGroup);
+
+        data.features.forEach(feature => {
+          const name = feature.properties.name || feature.properties.NAME_1 || "İl";
+          const key = trKey(name);
+
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", geoJsonToSvgPath(feature.geometry));
+          path.setAttribute("data-name", name);
+          path.setAttribute("data-key", key);
+
+          path.onclick = () => toggleProvince(key);
+          path.onmousemove = (e) => {
+            tooltip.style.display = "block";
+            tooltip.style.left = e.pageX + 10 + "px";
+            tooltip.style.top = e.pageY - 25 + "px";
+            tooltip.textContent = name;
+          };
+          path.onmouseleave = () => { tooltip.style.display = "none"; };
+
+          pathGroup.appendChild(path);
+
+          const center = getVisualCenter(key, feature.geometry);
+
+          const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          nameText.setAttribute("class", "auto-province-name");
+          nameText.setAttribute("x", center.x);
+          nameText.setAttribute("y", center.y);
+          nameText.setAttribute("font-size", "12");
+          nameText.setAttribute("text-anchor", "middle");
+          nameText.setAttribute("dominant-baseline", "central");
+          nameText.setAttribute("fill", nameColorPicker.value);
+          nameText.textContent = name;
+
+          makeInteractive(nameText);
+          autoNamesGroup.appendChild(nameText);
+
+          const btn = document.createElement("button");
+          btn.className = "province-row";
+          btn.innerHTML = `<span>${name}</span> <span class="province-color-indicator" style="background:${basePicker.value}"></span>`;
+          btn.onclick = () => toggleProvince(key);
+          listContainer.appendChild(btn);
+
+          provinceMap.set(key, { name, path, button: btn });
+        });
+
+        container.appendChild(svg);
+
+        const bbox = svg.getBBox();
+        const pad = 15;
+        initialViewBox = { x: bbox.x - pad, y: bbox.y - pad, w: bbox.width + (pad * 2), h: bbox.height + (pad * 2) };
+        currentViewBox = { ...initialViewBox };
+        applyViewBox();
+
+        document.getElementById("loading").classList.add("hidden");
+        updateStyles();
+      } catch (e) {
+        document.getElementById("loading").textContent = "Harita yüklenemedi. Lütfen bağlantınızı kontrol edin.";
+      }
+    }
+
+    function applyViewBox() {
+      if (svgElement) {
+        svgElement.setAttribute("viewBox", `${currentViewBox.x} ${currentViewBox.y} ${currentViewBox.w} ${currentViewBox.h}`);
+      }
+    }
+
+    // Zoom Kontrolleri
+    document.getElementById("zoom-in").onclick = () => {
+      const factor = 0.8;
+      const nw = currentViewBox.w * factor;
+      const nh = currentViewBox.h * factor;
+      currentViewBox.x += (currentViewBox.w - nw) / 2;
+      currentViewBox.y += (currentViewBox.h - nh) / 2;
+      currentViewBox.w = nw;
+      currentViewBox.h = nh;
+      applyViewBox();
+    };
+
+    document.getElementById("zoom-out").onclick = () => {
+      const factor = 1.25;
+      const nw = currentViewBox.w * factor;
+      const nh = currentViewBox.h * factor;
+      currentViewBox.x += (currentViewBox.w - nw) / 2;
+      currentViewBox.y += (currentViewBox.h - nh) / 2;
+      currentViewBox.w = nw;
+      currentViewBox.h = nh;
+      applyViewBox();
+    };
+
+    document.getElementById("zoom-reset").onclick = () => {
+      currentViewBox = { ...initialViewBox };
+      applyViewBox();
+    };
+
+    toggleBoundaryBtn.onclick = () => {
+      showBoundaries = !showBoundaries;
+      toggleBoundaryBtn.textContent = showBoundaries ? "Sınırları Gizle" : "Sınırları Göster";
+      updateStyles();
+    };
+
+    toggleNamesBtn.onclick = () => {
+      showProvinceNames = !showProvinceNames;
+      autoNamesGroup.style.display = showProvinceNames ? "block" : "none";
+      toggleNamesBtn.textContent = showProvinceNames ? "İl İsimlerini Gizle" : "İl İsimlerini Göster";
+      toggleNamesBtn.classList.toggle("btn-danger", showProvinceNames);
+      toggleNamesBtn.classList.toggle("btn-primary", !showProvinceNames);
+    };
+
+    // SÜRÜKLEME SİSTEMİ
+    function makeInteractive(element) {
+      if (!element.classList.contains("auto-province-name")) {
+        element.ondblclick = (e) => {
+          e.stopPropagation();
+          element.remove();
+        };
+      }
+
+      let isDragging = false;
+      let startMouseX, startMouseY, startX, startY;
+
+      element.onmousedown = (e) => {
+        e.stopPropagation();
+        isDragging = true;
+        
+        startMouseX = e.clientX;
+        startMouseY = e.clientY;
+
+        const isText = element.tagName === "text";
+        startX = parseFloat(element.getAttribute(isText ? "x" : "cx") || element.getAttribute("x") || 0);
+        startY = parseFloat(element.getAttribute(isText ? "y" : "cy") || element.getAttribute("y") || 0);
+
+        document.onmousemove = (moveEv) => {
+          if (!isDragging) return;
+          
+          const rect = svgElement.getBoundingClientRect();
+          const scaleX = currentViewBox.w / rect.width;
+          const scaleY = currentViewBox.h / rect.height;
+
+          const dx = (moveEv.clientX - startMouseX) * scaleX;
+          const dy = (moveEv.clientY - startMouseY) * scaleY;
+
+          if (isText || element.tagName === "rect") {
+            element.setAttribute("x", startX + dx);
+            element.setAttribute("y", startY + dy);
+          } else if (element.tagName === "polygon" || element.tagName === "path") {
+            element.setAttribute("transform", `translate(${dx}, ${dy})`);
+          } else {
+            element.setAttribute("cx", startX + dx);
+            element.setAttribute("cy", startY + dy);
+          }
+        };
+
+        document.onmouseup = () => {
+          isDragging = false;
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+      };
+    }
+
+    function createSvgLabel(text) {
+      if (!text.trim() || !labelGroup) return;
+
+      const size = labelSizeInput.value || 14;
+      const color = labelColorPicker.value || "#000000";
+
+      const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      textNode.setAttribute("class", "svg-interactive");
+      
+      const centerX = currentViewBox.x + currentViewBox.w / 2;
+      const centerY = currentViewBox.y + currentViewBox.h / 2;
+
+      textNode.setAttribute("x", centerX);
+      textNode.setAttribute("y", centerY);
+      textNode.setAttribute("font-size", size);
+      textNode.setAttribute("font-weight", "bold");
+      textNode.setAttribute("font-family", "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif");
+      textNode.setAttribute("fill", color);
+      textNode.setAttribute("text-anchor", "middle");
+      textNode.setAttribute("dominant-baseline", "central");
+      textNode.textContent = text;
+
+      makeInteractive(textNode);
+      labelGroup.appendChild(textNode);
+    }
+
+    function createSvgShape(type) {
+      if (!labelGroup) return;
+
+      const size = parseFloat(shapeSizeInput.value) || 14;
+      const color = shapeColorPicker.value || "#d22828";
+      const cx = currentViewBox.x + currentViewBox.w / 2;
+      const cy = currentViewBox.y + currentViewBox.h / 2;
+
+      let shapeNode = null;
+
+      if (type === "dot") {
+        shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        shapeNode.setAttribute("cx", cx);
+        shapeNode.setAttribute("cy", cy);
+        shapeNode.setAttribute("r", size / 2);
+        shapeNode.setAttribute("fill", color);
+      } else if (type === "ellipse") {
+        shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        shapeNode.setAttribute("cx", cx);
+        shapeNode.setAttribute("cy", cy);
+        shapeNode.setAttribute("rx", size);
+        shapeNode.setAttribute("ry", size / 2);
+        shapeNode.setAttribute("fill", color);
+      } else if (type === "square") {
+        shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        shapeNode.setAttribute("x", cx - size / 2);
+        shapeNode.setAttribute("y", cy - size / 2);
+        shapeNode.setAttribute("width", size);
+        shapeNode.setAttribute("height", size);
+        shapeNode.setAttribute("fill", color);
+        shapeNode.setAttribute("rx", "2");
+      } else if (type === "triangle") {
+        shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        const r = size / 1.2;
+        const p1 = `${cx},${cy - r}`;
+        const p2 = `${cx - r * 0.866},${cy + r * 0.5}`;
+        const p3 = `${cx + r * 0.866},${cy + r * 0.5}`;
+        shapeNode.setAttribute("points", `${p1} ${p2} ${p3}`);
+        shapeNode.setAttribute("fill", color);
+      } else if (type === "pentagon") {
+        shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        let pts = [];
+        const r = size / 1.2;
+        for (let i = 0; i < 5; i++) {
+          const a = (i * 72 - 90) * Math.PI / 180;
+          pts.push(`${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`);
+        }
+        shapeNode.setAttribute("points", pts.join(" "));
+        shapeNode.setAttribute("fill", color);
+      } else if (type === "star") {
+        shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        shapeNode.setAttribute("x", cx);
+        shapeNode.setAttribute("y", cy);
+        shapeNode.setAttribute("font-size", size * 1.5);
+        shapeNode.setAttribute("fill", color);
+        shapeNode.setAttribute("text-anchor", "middle");
+        shapeNode.setAttribute("dominant-baseline", "central");
+        shapeNode.textContent = "★";
+      }
+
+      if (shapeNode) {
+        shapeNode.setAttribute("class", "svg-interactive");
+        makeInteractive(shapeNode);
+        labelGroup.appendChild(shapeNode);
+      }
+    }
+
+    document.getElementById("add-label-btn").onclick = () => {
+      const input = document.getElementById("label-input");
+      createSvgLabel(input.value);
+      input.value = "";
+    };
+
+    document.querySelectorAll(".quick-roman").forEach(btn => {
+      btn.onclick = () => createSvgLabel(btn.textContent);
+    });
+
+    document.getElementById("add-dot-btn").onclick = () => createSvgShape("dot");
+    document.getElementById("add-triangle-btn").onclick = () => createSvgShape("triangle");
+    document.getElementById("add-square-btn").onclick = () => createSvgShape("square");
+    document.getElementById("add-pentagon-btn").onclick = () => createSvgShape("pentagon");
+    document.getElementById("add-ellipse-btn").onclick = () => createSvgShape("ellipse");
+    document.getElementById("add-star-btn").onclick = () => createSvgShape("star");
+
+    // VEKTÖR (SVG) İNDİRME FONKSİYONU
+    document.getElementById("download-svg").onclick = () => {
+      if (!svgElement) return;
+
+      const cloneSvg = svgElement.cloneNode(true);
+      
+      const styleNode = document.createElementNS("http://www.w3.org/2000/svg", "style");
+      styleNode.textContent = `
+        text { 
+          font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; 
+          font-weight: bold !important;
+        }
+      `;
+      cloneSvg.insertBefore(styleNode, cloneSvg.firstChild);
+
+      const pad = 8;
+      const bbox = svgElement.getBBox();
+      const cropX = bbox.x - pad;
+      const cropY = bbox.y - pad;
+      const cropW = bbox.width + (pad * 2);
+      const cropH = bbox.height + (pad * 2);
+
+      cloneSvg.setAttribute("width", cropW);
+      cloneSvg.setAttribute("height", cropH);
+      cloneSvg.setAttribute("viewBox", `${cropX} ${cropY} ${cropW} ${cropH}`);
+
+      const svgString = new XMLSerializer().serializeToString(cloneSvg);
+      const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(svgBlob);
+
+      const link = document.createElement("a");
+      link.download = `turkiye-haritasi-vektor.svg`;
+      link.href = url;
+      link.click();
+      
+      URL.revokeObjectURL(url);
+    };
+
+    // RASTER (PNG/JPEG) İNDİRME FONKSİYONU
+    async function exportImage(format) {
+      if (!svgElement) return;
+
+      const inputVal = document.getElementById("export-width").value;
+      const widthCm = inputVal && Number(inputVal) > 0 ? Number(inputVal) : 7;
+      
+      const targetWidth = Math.round((widthCm * 300) / 2.54);
+
+      const cloneSvg = svgElement.cloneNode(true);
+
+      const styleNode = document.createElementNS("http://www.w3.org/2000/svg", "style");
+      styleNode.textContent = `
+        text { 
+          font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; 
+          font-weight: bold !important;
+        }
+      `;
+      cloneSvg.insertBefore(styleNode, cloneSvg.firstChild);
+      
+      const pad = 8;
+      const bbox = svgElement.getBBox();
+      const cropX = bbox.x - pad;
+      const cropY = bbox.y - pad;
+      const cropW = bbox.width + (pad * 2);
+      const cropH = bbox.height + (pad * 2);
+
+      const scaleFactor = 2;
+      const renderWidth = targetWidth * scaleFactor;
+      const aspectRatio = cropH / cropW;
+      const renderHeight = Math.round(renderWidth * aspectRatio);
+
+      cloneSvg.setAttribute("width", cropW);
+      cloneSvg.setAttribute("height", cropH);
+      cloneSvg.setAttribute("viewBox", `${cropX} ${cropY} ${cropW} ${cropH}`);
+
+      const svgString = new XMLSerializer().serializeToString(cloneSvg);
+      const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = () => {
+        const renderCanvas = document.createElement("canvas");
+        renderCanvas.width = renderWidth;
+        renderCanvas.height = renderHeight;
+        const rCtx = renderCanvas.getContext("2d");
+        
+        rCtx.imageSmoothingEnabled = true;
+        rCtx.imageSmoothingQuality = "high";
+
+        if (format === "jpeg") {
+          rCtx.fillStyle = "#ffffff";
+          rCtx.fillRect(0, 0, renderWidth, renderHeight);
+        }
+        rCtx.drawImage(img, 0, 0, renderWidth, renderHeight);
+
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = targetWidth;
+        finalCanvas.height = Math.round(targetWidth * aspectRatio);
+        const fCtx = finalCanvas.getContext("2d");
+
+        fCtx.imageSmoothingEnabled = true;
+        fCtx.imageSmoothingQuality = "high";
+
+        if (format === "jpeg") {
+          fCtx.fillStyle = "#ffffff";
+          fCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+        }
+
+        fCtx.drawImage(renderCanvas, 0, 0, renderWidth, renderHeight, 0, 0, finalCanvas.width, finalCanvas.height);
+
+        URL.revokeObjectURL(url);
+
+        const link = document.createElement("a");
+        link.download = `turkiye-haritasi-${widthCm}cm.${format}`;
+        link.href = finalCanvas.toDataURL(`image/${format}`, format === "jpeg" ? 0.98 : undefined);
+        link.click();
+      };
+
+      img.src = url;
+    }
+
+    basePicker.oninput = updateStyles;
+    selectedPicker.oninput = updateStyles;
+    boundaryPicker.oninput = updateStyles;
+    nameColorPicker.oninput = updateStyles;
+    nameSizeInput.oninput = updateStyles;
+
+    document.getElementById("download-png").onclick = () => exportImage("png");
+    document.getElementById("download-jpeg").onclick = () => exportImage("jpeg");
+
+    document.getElementById("search-input").oninput = (e) => {
+      const q = trKey(e.target.value);
+      provinceMap.forEach((entry, key) => {
+        entry.button.style.display = key.includes(q) ? "flex" : "none";
+      });
+    };
+
+    initMap();
+  </script>
+</body>
+</html>
