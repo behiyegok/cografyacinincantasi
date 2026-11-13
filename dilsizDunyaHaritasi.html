@@ -104,8 +104,10 @@
     .guide-block li { margin-bottom: 3px; }
 
     /* Footer */
+/* Footer & Versiyon Rozeti */
     footer { background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-
+    .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .version-badge { font-size: 11px; font-weight: 600; color: #64748b; background: #f8fafc; border: 1px solid #e2e8f0; padding: 3px 10px; border-radius: 999px; letter-spacing: 0.2px; }
     /* SVG Etiket & Şekil Stilleri */
     .svg-interactive { cursor: move; user-select: none; }
     .svg-interactive:hover { opacity: 0.8; stroke-dasharray: 2 2; }
@@ -303,6 +305,7 @@
     </section>
 
     <!-- 3. ALT KISIM: İndirme ve Genişlik Kontrolleri -->
+<!-- 3. ALT KISIM: İndirme ve Genişlik Kontrolleri -->
     <footer>
       <div style="display: flex; align-items: center; gap: 8px;">
         <label for="export-width" style="font-size: 12px; font-weight: 600;">Çıktı Genişliği (cm):</label>
@@ -310,10 +313,13 @@
         <span style="font-size: 12px; color: #6b7280;">(Boş kalırsa varsayılan: 12 cm)</span>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <button id="download-svg" class="btn btn-vector" style="padding: 10px 20px;">SVG (Vektör) İndir</button>
-        <button id="download-png" class="btn btn-danger" style="padding: 10px 20px;">PNG İndir</button>
-        <button id="download-jpeg" class="btn btn-primary" style="padding: 10px 20px;">JPEG İndir</button>
+      <div class="footer-right">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button id="download-svg" class="btn btn-vector" style="padding: 10px 20px;">SVG (Vektör) İndir</button>
+          <button id="download-png" class="btn btn-danger" style="padding: 10px 20px;">PNG İndir</button>
+          <button id="download-jpeg" class="btn btn-primary" style="padding: 10px 20px;">JPEG İndir</button>
+        </div>
+        <div class="version-badge">v1.2 • Son Güncelleme: 13 Kasım 2026</div>
       </div>
     </footer>
 
