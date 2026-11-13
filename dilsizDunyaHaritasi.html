@@ -319,11 +319,14 @@
           <button id="download-png" class="btn btn-danger" style="padding: 10px 20px;">PNG İndir</button>
           <button id="download-jpeg" class="btn btn-primary" style="padding: 10px 20px;">JPEG İndir</button>
         </div>
-        <div class="version-badge">v1.2 • Son Güncelleme: 13 Kasım 2026</div>
+      
+        <div id="version-info" class="version-badge">Sürüm bilgisi yükleniyor...</div>
       </div>
     </footer>
 
   </div>
+
+  
 
   <script>
     const basePicker = document.getElementById("base-color");
@@ -372,6 +375,26 @@
       "Uzbekistan": "Özbekistan", "Turkmenistan": "Türkmenistan", "Pakistan": "Pakistan", "Afghanistan": "Afganistan"
     };
 
+    // GitHub API üzerinden dinamik versiyon ve son güncelleme tarihi çekme
+    (async function loadGitHubVersion() {
+      const badge = document.getElementById("version-info");
+      if (!badge) return;
+      const fileName = location.pathname.split("/").pop() || "dilsizDunyaHaritasi.html";
+      try {
+        const res = await fetch(`https://api.github.com/repos/behiyegok/cografyacinincantasi/commits?path=${fileName}`);
+        if (!res.ok) throw new Error();
+        const commits = await res.json();
+        if (commits.length > 0) {
+          const lastDate = new Date(commits[0].commit.committer.date);
+          const formattedDate = lastDate.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+          badge.textContent = `v1.${commits.length} • Son Güncelleme: ${formattedDate}`;
+        }
+      } catch {
+        badge.textContent = "v1.2 • Güncel Sürüm";
+      }
+    })();
+
+    
     function getCountryCenter(geometry) {
       let targetPolygon = geometry.coordinates;
       if (geometry.type === "MultiPolygon") {
