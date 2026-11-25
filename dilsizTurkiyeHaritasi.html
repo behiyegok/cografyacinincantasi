@@ -265,10 +265,20 @@
    <!-- 2. ORTA KISIM: Kontrol Panelleri -->
     <section class="control-grid">
       
-      <!-- 1. Kart: Metin / Etiket Ayarları Paneli -->
+     <!-- 1. Kart: Metin / Etiket Ayarları Paneli -->
       <div class="card">
         <h2 class="card-title">Metin & Romen Rakamı Ekle</h2>
         
+        <div class="switch-row">
+          <span class="switch-label">Metin Ayarları</span>
+          <div class="row-controls">
+            <input id="label-size" type="number" class="mini-number" value="14" min="6" max="40" title="Yazı Boyutu (Punto)">
+            <button type="button" class="swatch-btn mini-swatch" data-color-target="label">
+              <span class="swatch-preview" id="preview-label" style="background: #d22828;"></span>
+            </button>
+          </div>
+        </div>
+
         <div style="display: flex; gap: 8px;">
           <input id="label-input" type="text" placeholder="I, A, 1">
           <button id="add-label-btn" class="btn btn-primary" style="white-space: nowrap;">Ekle</button>
@@ -281,24 +291,22 @@
           <button class="quick-roman">IV</button>
           <button class="quick-roman">V</button>
         </div>
-
-        <div class="separator">
-          <div class="switch-row">
-            <span class="switch-label">Metin Ayarları</span>
-            <div class="row-controls">
-              <input id="label-size" type="number" class="mini-number" value="14" min="6" max="40" title="Yazı Boyutu (Punto)">
-              <button type="button" class="swatch-btn mini-swatch" data-color-target="label">
-                <span class="swatch-preview" id="preview-label" style="background: #000000;"></span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- 2. Kart: Şekil / Nokta İşaretleme Paneli -->
       <div class="card">
         <h2 class="card-title">Şekil & İşaret Ekle</h2>
         
+        <div class="switch-row">
+          <span class="switch-label">Şekil Ayarları</span>
+          <div class="row-controls">
+            <input id="shape-size" type="number" class="mini-number" value="14" min="4" max="80" title="Şekil Boyutu">
+            <button type="button" class="swatch-btn mini-swatch" data-color-target="shape">
+              <span class="swatch-preview" id="preview-shape" style="background: #d22828;"></span>
+            </button>
+          </div>
+        </div>
+
         <div class="grid-2">
           <button id="add-dot-btn" class="btn">● Dolu Daire</button>
           <button id="add-triangle-btn" class="btn">▲ Üçgen</button>
@@ -307,20 +315,7 @@
           <button id="add-ellipse-btn" class="btn">⬏ Yatay Elips</button>
           <button id="add-star-btn" class="btn">★ Yıldız</button>
         </div>
-
-        <div class="separator">
-          <div class="switch-row">
-            <span class="switch-label">Şekil Ayarları</span>
-            <div class="row-controls">
-              <input id="shape-size" type="number" class="mini-number" value="14" min="4" max="80" title="Şekil Boyutu">
-              <button type="button" class="swatch-btn mini-swatch" data-color-target="shape">
-                <span class="swatch-preview" id="preview-shape" style="background: #d22828;"></span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
-
       <!-- 3. Kart: Harita & İl Ayarları -->
       <div class="card">
         <h2 class="card-title">Harita & İl Ayarları</h2>
@@ -353,7 +348,7 @@
                 <span class="swatch-preview" id="preview-boundary" style="background: #000000;"></span>
               </button>
               <label class="switch">
-                <input id="toggle-boundaries" type="checkbox" checked>
+                <input id="toggle-boundaries" type="checkbox">
                 <span class="slider"></span>
               </label>
             </div>
@@ -376,11 +371,11 @@
         <!-- İl İsim Katmanları -->
         <div class="separator">
           <div class="switch-row">
-            <label class="switch-label" for="toggle-province-names">Tüm İsimler</label>
+            <label class="switch-label" for="toggle-province-names">Tüm İl İsimleri</label>
             <div class="row-controls">
               <input id="province-name-size" type="number" class="mini-number" value="11" min="6" max="30" title="Yazı Boyutu (Punto)">
               <button type="button" class="swatch-btn mini-swatch" data-color-target="allNames">
-                <span class="swatch-preview" id="preview-allNames" style="background: #173047;"></span>
+                <span class="swatch-preview" id="preview-allNames" style="background: #000000;"></span>
               </button>
               <label class="switch">
                 <input id="toggle-province-names" type="checkbox">
@@ -390,11 +385,11 @@
           </div>
 
           <div class="switch-row">
-            <label class="switch-label" for="toggle-selected-names">Seçili İsimler</label>
+            <label class="switch-label" for="toggle-selected-names">Seçili İl İsimleri</label>
             <div class="row-controls">
               <input id="selected-name-size" type="number" class="mini-number" value="12" min="6" max="30" title="Yazı Boyutu (Punto)">
               <button type="button" class="swatch-btn mini-swatch" data-color-target="selectedNames">
-                <span class="swatch-preview" id="preview-selectedNames" style="background: #ffffff;"></span>
+                <span class="swatch-preview" id="preview-selectedNames" style="background: #000000;"></span>
               </button>
               <label class="switch">
                 <input id="toggle-selected-names" type="checkbox">
@@ -404,7 +399,7 @@
           </div>
         </div>
       </div>
-
+      
       <!-- 4. Kart: İl Arama ve Liste -->
       <div class="card province-list-card">
         <h2 class="card-title">İl Listesi</h2>
@@ -514,15 +509,15 @@
   </div>
 
   <script>
-    // Renk Durum Deposu (Tüm Renk Seçiciler İçin)
+   // Renk Durum Deposu (Tüm Renk Seçiciler İçin)
     const colorState = {
       base: "#cccccc",
       selected: "#d22828",
       boundary: "#000000",
       water: "#0284c7",
-      allNames: "#173047",
-      selectedNames: "#ffffff",
-      label: "#000000",
+      allNames: "#000000",
+      selectedNames: "#000000",
+      label: "#d22828",
       shape: "#d22828"
     };
 
@@ -554,7 +549,7 @@
     const container = document.getElementById("svg-container");
 
     // Durum Değişkenleri
-    let showBoundaries = true;
+    let showBoundaries = false;
     let showHydrology = false;
     let showProvinceNames = false;
     let showSelectedNames = false;
@@ -1242,8 +1237,8 @@
       const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
       textNode.setAttribute("class", "svg-interactive");
       
-      const centerX = currentViewBox.x + currentViewBox.w / 2;
-      const centerY = currentViewBox.y + currentViewBox.h / 2;
+      const centerX = initialViewBox.x + initialViewBox.w * 0.485;
+      const centerY = initialViewBox.y + initialViewBox.h * 0.935;
 
       textNode.setAttribute("x", centerX);
       textNode.setAttribute("y", centerY);
@@ -1266,8 +1261,8 @@
       const fillCol = colorState.shape;
       const strokeCol = fillCol === "none" ? "#173047" : "none";
       const strokeW = fillCol === "none" ? "1.5" : "0";
-      const cx = currentViewBox.x + currentViewBox.w / 2;
-      const cy = currentViewBox.y + currentViewBox.h / 2;
+      const cx = initialViewBox.x + initialViewBox.w * 0.485;
+      const cy = initialViewBox.y + initialViewBox.h * 0.935;
 
       let shapeNode = null;
 
