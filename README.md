@@ -33,4 +33,4 @@ Coğrafya dersleri, sunumlar, çalışma kağıtları ve sınav soruları hazır
 
 ## 📄 Lisans
 
-Bu proje eğitim ve öğretim materyali üretimini desteklemek amacıyla hazırlanmıştır.
+Bu araç, eğitim ve öğretim materyali üretimini desteklemek amacıyla Behiye Gök Bozkurt tarafından hazırlanmıştır. Platform üzerinden oluşturduğunuz ve indirdiğiniz tüm harita görsellerini (SVG, PNG, JPEG) ders notlarınızda, sunumlarınızda, sınav kağıtlarınızda ve eğitim yayınlarınızda hiçbir telif kaygısı olmadan özgürce kullanabilirsiniz. Sitenin yazılım altyapısı, arayüz tasarımı ve özgün kurgusu ise geliştiricisine ait olup izinsiz kopyalanması veya başka bir platformda yayınlanması yasaktır.
