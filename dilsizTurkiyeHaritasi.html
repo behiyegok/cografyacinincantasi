@@ -111,8 +111,8 @@
     .btn-vector { background: var(--vector); color: #ffffff; border: none; }
     .btn-vector:hover { opacity: 0.9; }
 
-    .roman-container { display: flex; flex-wrap: wrap; gap: 4px; }
-    .quick-roman { padding: 2px 8px; font-size: 12px; font-weight: bold; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; cursor: pointer; }
+    .roman-container { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 3px; }
+    .quick-roman { flex: 1; padding: 4px 2px; font-size: 11px; font-weight: bold; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; cursor: pointer; text-align: center; }
     .quick-roman:hover { background: #e5e7eb; }
 
     /* Belirginleştirilmiş Separatörler & Standart Mini Kontroller */
@@ -121,16 +121,9 @@
     .mini-number { width: 46px !important; padding: 3px 2px !important; text-align: center; font-weight: 700; font-size: 11px !important; height: 28px; }
     .mini-swatch { width: 46px !important; }
 
-    /* Belirginleştirilmiş Separatörler */
-    .separator { border-top: 2px solid var(--separator-color); padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
-    .section-subtitle { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; }
-
-    .sub-controls { display: flex; align-items: center; gap: 6px; padding-left: 4px; }
-    .mini-number { width: 54px !important; padding: 4px !important; text-align: center; font-weight: 700; font-size: 11px !important; height: 28px; }
-
-    /* İl Listesi */
+    /* İl Listesi (Ankara Seviyesinde Bitiş) */
     .province-list-card { display: flex; flex-direction: column; }
-    #province-list { max-height: 285px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 4px; margin-top: 4px; }
+    #province-list { max-height: 224px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 4px; margin-top: 4px; }
     .province-row { width: 100%; text-align: left; padding: 6px 12px; border-radius: 6px; border: 1px solid #e5e7eb; font-size: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #fff; }
     .province-row.is-selected { border-color: var(--accent); background: #fde8e8; }
     .province-color-indicator { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); display: inline-block; position: relative; overflow: hidden; }
@@ -279,17 +272,37 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 8px;">
-          <input id="label-input" type="text" placeholder="I, A, 1">
-          <button id="add-label-btn" class="btn btn-primary" style="white-space: nowrap;">Ekle</button>
-        </div>
-
+<!-- Romen Rakamları (I - V) -->
         <div class="roman-container">
           <button class="quick-roman">I</button>
           <button class="quick-roman">II</button>
           <button class="quick-roman">III</button>
           <button class="quick-roman">IV</button>
           <button class="quick-roman">V</button>
+        </div>
+        
+<!-- Rakamlar (1 - 5) -->
+        <div class="roman-container">
+          <button class="quick-roman">1</button>
+          <button class="quick-roman">2</button>
+          <button class="quick-roman">3</button>
+          <button class="quick-roman">4</button>
+          <button class="quick-roman">5</button>
+        </div>
+
+        <!-- Harfler (A - E) -->
+        <div class="roman-container">
+          <button class="quick-roman">A</button>
+          <button class="quick-roman">B</button>
+          <button class="quick-roman">C</button>
+          <button class="quick-roman">D</button>
+          <button class="quick-roman">E</button>
+        </div>
+
+        <!-- Özel Metin Girişi -->
+        <div style="display: flex; gap: 8px;">
+          <input id="label-input" type="text" placeholder="I, A, 1">
+          <button id="add-label-btn" class="btn btn-primary" style="white-space: nowrap;">Ekle</button>
         </div>
       </div>
 
@@ -312,7 +325,7 @@
           <button id="add-triangle-btn" class="btn">▲ Üçgen</button>
           <button id="add-square-btn" class="btn">■ Kare</button>
           <button id="add-pentagon-btn" class="btn">⬟ Beşgen</button>
-          <button id="add-ellipse-btn" class="btn">⬏ Yatay Elips</button>
+        <button id="add-ellipse-btn" class="btn">⬬ Yatay Elips</button>
           <button id="add-star-btn" class="btn">★ Yıldız</button>
         </div>
       </div>
@@ -373,7 +386,7 @@
           <div class="switch-row">
             <label class="switch-label" for="toggle-province-names">Tüm İl İsimleri</label>
             <div class="row-controls">
-              <input id="province-name-size" type="number" class="mini-number" value="11" min="6" max="30" title="Yazı Boyutu (Punto)">
+              <input id="province-name-size" type="number" class="mini-number" value="10" min="6" max="30" title="Yazı Boyutu (Punto)">
               <button type="button" class="swatch-btn mini-swatch" data-color-target="allNames">
                 <span class="swatch-preview" id="preview-allNames" style="background: #000000;"></span>
               </button>
@@ -387,7 +400,7 @@
           <div class="switch-row">
             <label class="switch-label" for="toggle-selected-names">Seçili İl İsimleri</label>
             <div class="row-controls">
-              <input id="selected-name-size" type="number" class="mini-number" value="12" min="6" max="30" title="Yazı Boyutu (Punto)">
+              <input id="selected-name-size" type="number" class="mini-number" value="10" min="6" max="30" title="Yazı Boyutu (Punto)">
               <button type="button" class="swatch-btn mini-swatch" data-color-target="selectedNames">
                 <span class="swatch-preview" id="preview-selectedNames" style="background: #000000;"></span>
               </button>
