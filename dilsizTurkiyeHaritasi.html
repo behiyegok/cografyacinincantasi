@@ -12,6 +12,7 @@
       --line: #dce2df; 
       --accent: #d22828; 
       --vector: #10b981;
+      --water: #0284c7;
       --separator-color: #b0bec5;
     }
     
@@ -54,13 +55,13 @@
     .hidden { display: none !important; }
 
     /* Kontrol Panelleri Grid */
-    .control-grid { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+    .control-grid { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: stretch; }
     @media (min-width: 768px) { .control-grid { grid-template-columns: repeat(4, 1fr); } }
 
-    .card { background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
+    .card { background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; }
     .card-title { font-weight: 700; font-size: 0.875rem; border-bottom: 2px solid var(--separator-color); padding-bottom: 8px; margin: 0; }
 
-    /* Form Elemanları */
+    /* Form Elemanları & Renk Kutusu (Swatch) */
     .form-group { display: flex; flex-direction: column; gap: 4px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .label-text { font-size: 11px; font-weight: 600; color: #4b5563; }
@@ -69,7 +70,37 @@
       width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 8px; font-size: 12px; outline: none;
     }
     input[type="text"]:focus, input[type="number"]:focus, input[type="search"]:focus { border-color: var(--accent); }
-    input[type="color"] { width: 100%; height: 28px; border-radius: 4px; border: 1px solid #d1d5db; padding: 2px; cursor: pointer; background: #fff; }
+
+    .swatch-btn {
+      width: 100%; height: 28px; border-radius: 6px; border: 1px solid #cbd5e1; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; padding: 3px 6px;
+      background: #fff; transition: border-color 0.15s;
+    }
+    .swatch-btn:hover { border-color: var(--ink); }
+    .swatch-preview {
+      width: 100%; height: 100%; border-radius: 4px; border: 1px solid rgba(0,0,0,0.12);
+      position: relative; overflow: hidden;
+    }
+    /* Renksiz / Şeffaf Görünümü (Adobe Çapraz Kırmızı Çizgi) */
+    .swatch-preview.is-none {
+      background: #ffffff !important;
+    }
+    .swatch-preview.is-none::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to top left, transparent calc(50% - 1.2px), #dc2626 calc(50% - 1.2px), #dc2626 calc(50% + 1.2px), transparent calc(50% + 1.2px));
+    }
+
+    /* Modern Toggle Switch (On / Off Sürgüsü) */
+   /* Modern Toggle Switch (On / Off Sürgüsü - Standart Koyu Yeşil) */
+    .switch-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; min-height: 28px; }
+    .switch-label { font-size: 11.5px; font-weight: 600; color: #1e293b; cursor: pointer; user-select: none; white-space: nowrap; }
+    .row-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .switch { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .25s; border-radius: 999px; }
+    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .25s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+    input:checked + .slider { background-color: #15803d; }
+    input:checked + .slider:before { transform: translateX(18px); }
 
     .btn { padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; border: 1px solid #d1d5db; cursor: pointer; transition: background 0.15s, opacity 0.15s; background: #f3f4f6; color: #374151; }
     .btn:hover { background: #e5e7eb; }
@@ -84,16 +115,29 @@
     .quick-roman { padding: 2px 8px; font-size: 12px; font-weight: bold; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; cursor: pointer; }
     .quick-roman:hover { background: #e5e7eb; }
 
-    /* Belirginleştirilmiş Separatörler */
-    .separator { border-top: 2px solid var(--separator-color); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .section-subtitle { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; }
+    /* Belirginleştirilmiş Separatörler & Standart Mini Kontroller */
+    .separator { border-top: 2px solid var(--separator-color); padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+    .section-subtitle { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; }
+    .mini-number { width: 46px !important; padding: 3px 2px !important; text-align: center; font-weight: 700; font-size: 11px !important; height: 28px; }
+    .mini-swatch { width: 46px !important; }
 
-    /* İL LİSTESİ YÜKSEKLİK KISALTMA (AMASYA SEVİYESİ) */
+    /* Belirginleştirilmiş Separatörler */
+    .separator { border-top: 2px solid var(--separator-color); padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+    .section-subtitle { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; }
+
+    .sub-controls { display: flex; align-items: center; gap: 6px; padding-left: 4px; }
+    .mini-number { width: 54px !important; padding: 4px !important; text-align: center; font-weight: 700; font-size: 11px !important; height: 28px; }
+
+    /* İl Listesi */
     .province-list-card { display: flex; flex-direction: column; }
-    #province-list { max-height: 230px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 4px; margin-top: 4px; }
+    #province-list { max-height: 285px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 4px; margin-top: 4px; }
     .province-row { width: 100%; text-align: left; padding: 6px 12px; border-radius: 6px; border: 1px solid #e5e7eb; font-size: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #fff; }
     .province-row.is-selected { border-color: var(--accent); background: #fde8e8; }
-    .province-color-indicator { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15); display: inline-block; }
+    .province-color-indicator { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); display: inline-block; position: relative; overflow: hidden; }
+    .province-color-indicator.is-none::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to top left, transparent calc(50% - 1px), #dc2626 calc(50% - 1px), #dc2626 calc(50% + 1px), transparent calc(50% + 1px));
+    }
 
     /* Kullanım Rehberi Alanı */
     .guide-section { background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
@@ -105,18 +149,84 @@
     .guide-block ul { margin: 0; padding-left: 16px; font-size: 11px; color: #4b5563; line-height: 1.5; }
     .guide-block li { margin-bottom: 3px; }
 
-    /* Footer */
-/* Footer & Versiyon Rozeti */
+    /* Footer & Versiyon Rozeti */
     footer { background: #ffffff; padding: 16px; border-radius: 12px; border: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
     .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
     .version-badge { font-size: 11px; font-weight: 600; color: #64748b; background: #f8fafc; border: 1px solid #e2e8f0; padding: 3px 10px; border-radius: 999px; letter-spacing: 0.2px; }
 
-    
     /* SVG Etiket & Şekil Stilleri */
     .svg-interactive { cursor: move; user-select: none; }
     .svg-interactive:hover { opacity: 0.8; stroke-dasharray: 2 2; }
-    .auto-province-name { user-select: none; font-weight: 700; cursor: move; }
-    .auto-province-name:hover { opacity: 0.7; }
+    .auto-province-name, .selected-province-name { user-select: none; font-weight: 700; cursor: move; }
+    .auto-province-name:hover, .selected-province-name:hover { opacity: 0.7; }
+    .hydrology-layer { pointer-events: none; }
+
+    /* ADOBE TARZI ÖZEL RENK SEÇİCİ PENCERESİ (MODAL) */
+    .cp-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(2px);
+      display: none; align-items: center; justify-content: center; z-index: 9999;
+    }
+    .cp-overlay.open { display: flex; }
+    .cp-dialog {
+      background: #2b2b2b; color: #f1f5f9; width: 410px; max-width: 95vw;
+      border-radius: 10px; border: 1px solid #475569; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.4);
+      padding: 16px; display: flex; flex-direction: column; gap: 12px; user-select: none;
+    }
+    .cp-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3f3f46; padding-bottom: 8px; font-size: 13px; font-weight: 700; }
+    .cp-body { display: flex; gap: 12px; align-items: stretch; }
+    
+    /* 2D Doygunluk/Parlaklık Karesi */
+    .cp-sv-box {
+      width: 200px; height: 200px; position: relative; border-radius: 4px; border: 1px solid #52525b; cursor: crosshair; flex-shrink: 0;
+      background-color: #ff0000;
+      background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
+    }
+    .cp-sv-cursor {
+      width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 2px #000;
+      position: absolute; transform: translate(-6px, -6px); pointer-events: none;
+    }
+
+    /* Renk Tonu (Hue) Dikey Çubuğu */
+    .cp-hue-bar {
+      width: 20px; height: 200px; position: relative; border-radius: 4px; border: 1px solid #52525b; cursor: ns-resize; flex-shrink: 0;
+      background: linear-gradient(to bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+    }
+    .cp-hue-cursor {
+      position: absolute; left: -3px; right: -3px; height: 6px; border: 1.5px solid #fff; box-shadow: 0 0 2px #000;
+      transform: translateY(-3px); pointer-events: none;
+    }
+
+    /* Sağ Panel: Önizleme, Renksiz Kutusu, RGB ve HEX */
+    .cp-controls { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
+    .cp-preview-row { display: flex; gap: 6px; align-items: center; }
+    .cp-preview-box {
+      flex: 1; height: 34px; border-radius: 4px; border: 1px solid #71717a; background: #d22828; position: relative; overflow: hidden;
+    }
+    .cp-preview-box.is-none { background: #fff !important; }
+    .cp-preview-box.is-none::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to top left, transparent calc(50% - 1.5px), #dc2626 calc(50% - 1.5px), #dc2626 calc(50% + 1.5px), transparent calc(50% + 1.5px));
+    }
+    .cp-none-swatch {
+      width: 34px; height: 34px; border-radius: 4px; border: 1px solid #71717a; background: #fff; cursor: pointer; position: relative; flex-shrink: 0;
+    }
+    .cp-none-swatch::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to top left, transparent calc(50% - 1.5px), #dc2626 calc(50% - 1.5px), #dc2626 calc(50% + 1.5px), transparent calc(50% + 1.5px));
+    }
+    .cp-none-swatch.active { outline: 2px solid #38bdf8; }
+
+    .cp-field { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; }
+    .cp-field label { color: #cbd5e1; font-weight: 700; width: 22px; }
+    .cp-field input {
+      background: #18181b !important; color: #f8fafc !important; border: 1px solid #52525b !important;
+      border-radius: 4px !important; padding: 3px 6px !important; font-size: 11px !important;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important; text-align: right;
+    }
+    .cp-footer { display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #3f3f46; padding-top: 10px; }
+    .cp-btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid #52525b; }
+    .cp-btn-cancel { background: #3f3f46; color: #f1f5f9; }
+    .cp-btn-ok { background: #0284c7; color: #ffffff; border-color: #0284c7; }
   </style>
 </head>
 <body>
@@ -152,27 +262,16 @@
       </div>
     </main>
 
-    <!-- 2. ORTA KISIM: Kontrol Panelleri -->
+   <!-- 2. ORTA KISIM: Kontrol Panelleri -->
     <section class="control-grid">
       
-      <!-- Metin / Etiket Ayarları Paneli -->
+      <!-- 1. Kart: Metin / Etiket Ayarları Paneli -->
       <div class="card">
         <h2 class="card-title">Metin & Romen Rakamı Ekle</h2>
         
         <div style="display: flex; gap: 8px;">
           <input id="label-input" type="text" placeholder="I, A, 1">
           <button id="add-label-btn" class="btn btn-primary" style="white-space: nowrap;">Ekle</button>
-        </div>
-
-        <div class="grid-2">
-          <div class="form-group">
-            <label class="label-text">Boyut</label>
-            <input id="label-size" type="number" value="14" min="6" max="40" style="text-align: center;">
-          </div>
-          <div class="form-group">
-            <label class="label-text">Renk</label>
-            <input id="label-color" type="color" value="#000000">
-          </div>
         </div>
 
         <div class="roman-container">
@@ -182,9 +281,21 @@
           <button class="quick-roman">IV</button>
           <button class="quick-roman">V</button>
         </div>
+
+        <div class="separator">
+          <div class="switch-row">
+            <span class="switch-label">Metin Ayarları</span>
+            <div class="row-controls">
+              <input id="label-size" type="number" class="mini-number" value="14" min="6" max="40" title="Yazı Boyutu (Punto)">
+              <button type="button" class="swatch-btn mini-swatch" data-color-target="label">
+                <span class="swatch-preview" id="preview-label" style="background: #000000;"></span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Şekil / Nokta İşaretleme Paneli -->
+      <!-- 2. Kart: Şekil / Nokta İşaretleme Paneli -->
       <div class="card">
         <h2 class="card-title">Şekil & İşaret Ekle</h2>
         
@@ -197,61 +308,104 @@
           <button id="add-star-btn" class="btn">★ Yıldız</button>
         </div>
 
-        <div class="grid-2">
-          <div class="form-group">
-            <label class="label-text">Şekil Rengi</label>
-            <input id="shape-color" type="color" value="#d22828">
-          </div>
-          <div class="form-group">
-            <label class="label-text">Şekil Boyutu</label>
-            <input id="shape-size" type="number" value="14" min="4" max="80" style="text-align: center;">
+        <div class="separator">
+          <div class="switch-row">
+            <span class="switch-label">Şekil Ayarları</span>
+            <div class="row-controls">
+              <input id="shape-size" type="number" class="mini-number" value="14" min="4" max="80" title="Şekil Boyutu">
+              <button type="button" class="swatch-btn mini-swatch" data-color-target="shape">
+                <span class="swatch-preview" id="preview-shape" style="background: #d22828;"></span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Renk Paleti ve Görünürlük Kontrolleri -->
+      <!-- 3. Kart: Harita & İl Ayarları -->
       <div class="card">
         <h2 class="card-title">Harita & İl Ayarları</h2>
         
-        <div class="grid-2">
-          <div class="form-group">
-            <label class="label-text">Harita Rengi</label>
-            <input id="base-color" type="color" value="#cccccc">
-          </div>
-          <div class="form-group">
-            <label class="label-text">Seçili İl Rengi</label>
-            <input id="selected-color" type="color" value="#d22828">
+        <!-- Zemin ve Seçili İl Renkleri -->
+        <div class="switch-row">
+          <span class="switch-label">Harita Rengi</span>
+          <div class="row-controls">
+            <button type="button" class="swatch-btn mini-swatch" data-color-target="base">
+              <span class="swatch-preview" id="preview-base" style="background: #cccccc;"></span>
+            </button>
           </div>
         </div>
 
-        <div class="separator">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-            <button id="toggle-boundaries" class="btn" style="width: 100%;">
-              Sınırları Gizle
+        <div class="switch-row">
+          <span class="switch-label">Seçili İl Rengi</span>
+          <div class="row-controls">
+            <button type="button" class="swatch-btn mini-swatch" data-color-target="selected">
+              <span class="swatch-preview" id="preview-selected" style="background: #d22828;"></span>
             </button>
-            <input id="boundary-color" type="color" value="#000000" style="width: 40px; shrink: 0;">
           </div>
+        </div>
 
-          <div class="separator">
-            <span class="section-subtitle">İl İsim Ayarları</span>
-            
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 6px; align-items: center;">
-              <button id="toggle-province-names" class="btn btn-primary">
-                İl İsimlerini Göster
+        <!-- Katman Anahtarları -->
+        <div class="separator">
+          <div class="switch-row">
+            <label class="switch-label" for="toggle-boundaries">İl Sınırları</label>
+            <div class="row-controls">
+              <button type="button" class="swatch-btn mini-swatch" data-color-target="boundary">
+                <span class="swatch-preview" id="preview-boundary" style="background: #000000;"></span>
               </button>
-              <input id="province-name-color" type="color" value="#173047" title="İsim Rengi">
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-              <label class="label-text">Yazı Boyutu (Punto):</label>
-              <input id="province-name-size" type="number" value="12" min="6" max="30" style="width: 56px; text-align: center; font-weight: bold;">
+              <label class="switch">
+                <input id="toggle-boundaries" type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
             </div>
           </div>
 
+          <div class="switch-row">
+            <label class="switch-label" for="toggle-hydrology">Akarsu & Göller</label>
+            <div class="row-controls">
+              <button type="button" class="swatch-btn mini-swatch" data-color-target="water">
+                <span class="swatch-preview" id="preview-water" style="background: #0284c7;"></span>
+              </button>
+              <label class="switch">
+                <input id="toggle-hydrology" type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- İl İsim Katmanları -->
+        <div class="separator">
+          <div class="switch-row">
+            <label class="switch-label" for="toggle-province-names">Tüm İsimler</label>
+            <div class="row-controls">
+              <input id="province-name-size" type="number" class="mini-number" value="11" min="6" max="30" title="Yazı Boyutu (Punto)">
+              <button type="button" class="swatch-btn mini-swatch" data-color-target="allNames">
+                <span class="swatch-preview" id="preview-allNames" style="background: #173047;"></span>
+              </button>
+              <label class="switch">
+                <input id="toggle-province-names" type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="switch-row">
+            <label class="switch-label" for="toggle-selected-names">Seçili İsimler</label>
+            <div class="row-controls">
+              <input id="selected-name-size" type="number" class="mini-number" value="12" min="6" max="30" title="Yazı Boyutu (Punto)">
+              <button type="button" class="swatch-btn mini-swatch" data-color-target="selectedNames">
+                <span class="swatch-preview" id="preview-selectedNames" style="background: #ffffff;"></span>
+              </button>
+              <label class="switch">
+                <input id="toggle-selected-names" type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- İl Arama ve Liste -->
+      <!-- 4. Kart: İl Arama ve Liste -->
       <div class="card province-list-card">
         <h2 class="card-title">İl Listesi</h2>
         <input id="search-input" type="search" placeholder="İl ara...">
@@ -270,7 +424,7 @@
           <ul>
             <li>İstediğiniz metni, harfi veya Romen rakamını yazıp <strong>Ekle</strong> butonuna basın.</li>
             <li>Eklenen metin haritanın ortasında belirir; fareyle tutup istediğiniz konuma sürükleyebilirsiniz.</li>
-            <li>Yazı boyutunu ve rengini eklemeden önce özelleştirebilirsiniz.</li>
+            <li>Renk kutusuna tıklayarak açılan pencereden RGB, HEX veya Renksiz seçeneğini belirleyebilirsiniz.</li>
             <li>Ekrandan kaldırmak istediğiniz metnin üzerine <strong>çift tıklamanız</strong> yeterlidir.</li>
           </ul>
         </div>
@@ -280,18 +434,17 @@
           <ul>
             <li>Daire, üçgen, kare, beşgen, elips veya yıldız butonlarına basarak haritaya simge ekleyebilirsiniz.</li>
             <li>Tüm şekiller fareyle harita üzerinde istenen şehre veya bölgeye kolayca sürüklenebilir.</li>
-            <li>Şekil rengini ve boyutunu paneldeki ayar kutularından değiştirebilirsiniz.</li>
+            <li>Şekil rengi kutusundan dolgu rengini veya şeffaf (renksiz) dolguyu seçebilirsiniz.</li>
             <li>Yanlış eklenen veya fazla olan şekilleri silmek için üzerine <strong>çift tıklayın</strong>.</li>
           </ul>
         </div>
 
         <div class="guide-block">
-          <h3>3. Harita & İl Ayarları</h3>
+          <h3>3. Harita, Hidrografya & İl Ayarları</h3>
           <ul>
-            <li><strong>Harita Rengi:</strong> Seçilmemiş tüm illerin temel zemin rengini değiştirir.</li>
-            <li><strong>Seçili İl Rengi:</strong> Tıklayacağınız illerin boyanacağı rengi belirler.</li>
-            <li><strong>Sınır Çizgileri:</strong> Sınırları gizleyebilir veya çizgi rengini değiştirebilirsiniz.</li>
-            <li><strong>İl İsimleri:</strong> Tüm il isimlerini açabilir, renklerini ve punto boyutlarını ayarlayabilirsiniz. Açılan isimler sürüklenebilir.</li>
+            <li><strong>Çoklu İl Boyama:</strong> Seçili il rengi kutusundan istediğiniz rengi (veya Renksiz seçeneğini) ayarlayıp her ili farklı renkte boyayabilirsiniz.</li>
+            <li><strong>Akarsu & Göller:</strong> Yalnızca Türkiye sınırları içindeki akarsu ve gölleri tek anahtarla açıp kapatabilirsiniz.</li>
+            <li><strong>İl İsimleri:</strong> İster tüm illerin ister yalnızca seçtiğiniz illerin isimlerini ayrı punto ve renkle gösterebilirsiniz.</li>
           </ul>
         </div>
 
@@ -309,7 +462,6 @@
     </section>
 
     <!-- 3. ALT KISIM: İndirme ve Genişlik Kontrolleri -->
-
     <footer>
       <div style="display: flex; align-items: center; gap: 8px;">
         <label for="export-width" style="font-size: 12px; font-weight: 600;">Çıktı Genişliği (cm):</label>
@@ -329,34 +481,94 @@
 
   </div>
 
+  <!-- ÖZEL RENK SEÇİCİ PENCERESİ (ADOBE TARZI) -->
+  <div id="cp-overlay" class="cp-overlay">
+    <div class="cp-dialog">
+      <div class="cp-header">
+        <span id="cp-title">Renk Seçici</span>
+        <span style="font-size: 11px; color: #94a3b8;">RGB / HEX / Renksiz</span>
+      </div>
+      <div class="cp-body">
+        <div id="cp-sv-box" class="cp-sv-box">
+          <div id="cp-sv-cursor" class="cp-sv-cursor"></div>
+        </div>
+        <div id="cp-hue-bar" class="cp-hue-bar">
+          <div id="cp-hue-cursor" class="cp-hue-cursor"></div>
+        </div>
+        <div class="cp-controls">
+          <div class="cp-preview-row">
+            <div id="cp-preview-box" class="cp-preview-box"></div>
+            <button type="button" id="cp-none-swatch" class="cp-none-swatch" title="Renksiz (Şeffaf)"></button>
+          </div>
+          <div class="cp-field"><label>R:</label><input id="cp-r" type="number" min="0" max="255" value="210"></div>
+          <div class="cp-field"><label>G:</label><input id="cp-g" type="number" min="0" max="255" value="40"></div>
+          <div class="cp-field"><label>B:</label><input id="cp-b" type="number" min="0" max="255" value="40"></div>
+          <div class="cp-field"><label>#:</label><input id="cp-hex" type="text" maxlength="6" value="D22828"></div>
+        </div>
+      </div>
+      <div class="cp-footer">
+        <button type="button" id="cp-cancel" class="cp-btn cp-btn-cancel">İptal</button>
+        <button type="button" id="cp-ok" class="cp-btn cp-btn-ok">Tamam</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const basePicker = document.getElementById("base-color");
-    const selectedPicker = document.getElementById("selected-color");
-    const boundaryPicker = document.getElementById("boundary-color");
-    const nameColorPicker = document.getElementById("province-name-color");
+    // Renk Durum Deposu (Tüm Renk Seçiciler İçin)
+    const colorState = {
+      base: "#cccccc",
+      selected: "#d22828",
+      boundary: "#000000",
+      water: "#0284c7",
+      allNames: "#173047",
+      selectedNames: "#ffffff",
+      label: "#000000",
+      shape: "#d22828"
+    };
+
+    const colorTitles = {
+      base: "Harita Rengi Seç",
+      selected: "Seçili İl Rengi Seç",
+      boundary: "Sınır Çizgisi Rengi Seç",
+      water: "Akarsu & Göl Rengi Seç",
+      allNames: "Tüm İl İsimleri Rengi Seç",
+      selectedNames: "Seçili İl İsimleri Rengi Seç",
+      label: "Metin & Romen Rakamı Rengi Seç",
+      shape: "Şekil Rengi Seç"
+    };
+
+    // Diğer Referanslar
     const nameSizeInput = document.getElementById("province-name-size");
-    const toggleBoundaryBtn = document.getElementById("toggle-boundaries");
-    const toggleNamesBtn = document.getElementById("toggle-province-names");
+    const selNameSizeInput = document.getElementById("selected-name-size");
+    const labelSizeInput = document.getElementById("label-size");
+    const shapeSizeInput = document.getElementById("shape-size");
+
+    const toggleBoundarySwitch = document.getElementById("toggle-boundaries");
+    const toggleHydrologySwitch = document.getElementById("toggle-hydrology");
+    const toggleNamesSwitch = document.getElementById("toggle-province-names");
+    const toggleSelectedNamesSwitch = document.getElementById("toggle-selected-names");
+
     const listContainer = document.getElementById("province-list");
     const countDisplay = document.getElementById("selected-count");
     const tooltip = document.getElementById("tooltip");
     const container = document.getElementById("svg-container");
 
-    const labelSizeInput = document.getElementById("label-size");
-    const labelColorPicker = document.getElementById("label-color");
-    const shapeSizeInput = document.getElementById("shape-size");
-    const shapeColorPicker = document.getElementById("shape-color");
-
+    // Durum Değişkenleri
     let showBoundaries = true;
+    let showHydrology = false;
     let showProvinceNames = false;
+    let showSelectedNames = false;
+    let hydrologyLoaded = false;
     
-    // Her ilin kendi rengini saklayan Harita (İl Key -> Renk Kodu)
     const selectedProvinceColors = new Map();
     const provinceMap = new Map();
 
     let svgElement = null;
     let pathGroup = null;
+    let turkeyClipPath = null;
+    let hydrologyGroup = null;
     let autoNamesGroup = null;
+    let selectedNamesGroup = null;
     let labelGroup = null;
 
     let initialViewBox = { x: 0, y: 0, w: 1000, h: 500 };
@@ -376,11 +588,200 @@
       "kırklareli": { dx: 10, dy: 0 }
     };
 
-    // GitHub API üzerinden dinamik versiyon ve son güncelleme tarihi çekme
+    // =========================================================
+    // ÖZEL RENK SEÇİCİ PENCERESİ (RGB / HEX / RENKSİZ) MANTIĞI
+    // =========================================================
+    const cpOverlay = document.getElementById("cp-overlay");
+    const cpTitle = document.getElementById("cp-title");
+    const cpSvBox = document.getElementById("cp-sv-box");
+    const cpSvCursor = document.getElementById("cp-sv-cursor");
+    const cpHueBar = document.getElementById("cp-hue-bar");
+    const cpHueCursor = document.getElementById("cp-hue-cursor");
+    const cpPreviewBox = document.getElementById("cp-preview-box");
+    const cpNoneSwatch = document.getElementById("cp-none-swatch");
+    const cpR = document.getElementById("cp-r");
+    const cpG = document.getElementById("cp-g");
+    const cpB = document.getElementById("cp-b");
+    const cpHex = document.getElementById("cp-hex");
+
+    let activeColorTarget = null;
+    let cpH = 0, cpS = 1, cpV = 1, cpIsNone = false;
+
+    function hsvToRgb(h, s, v) {
+      let c = v * s;
+      let x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+      let m = v - c;
+      let r1 = 0, g1 = 0, b1 = 0;
+      if (h < 60) { r1 = c; g1 = x; }
+      else if (h < 120) { r1 = x; g1 = c; }
+      else if (h < 180) { g1 = c; b1 = x; }
+      else if (h < 240) { g1 = x; b1 = c; }
+      else if (h < 300) { r1 = x; b1 = c; }
+      else { r1 = c; b1 = x; }
+      return {
+        r: Math.round((r1 + m) * 255),
+        g: Math.round((g1 + m) * 255),
+        b: Math.round((b1 + m) * 255)
+      };
+    }
+
+    function rgbToHsv(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      let max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let d = max - min;
+      let h = 0;
+      if (d !== 0) {
+        if (max === r) h = 60 * (((g - b) / d) % 6);
+        else if (max === g) h = 60 * ((b - r) / d + 2);
+        else h = 60 * ((r - g) / d + 4);
+      }
+      if (h < 0) h += 360;
+      let s = max === 0 ? 0 : d / max;
+      return { h, s, v: max };
+    }
+
+    function rgbToHex(r, g, b) {
+      return [r, g, b].map(x => Math.max(0, Math.min(255, x)).toString(16).padStart(2, "0")).join("").toUpperCase();
+    }
+
+    function hexToRgb(hex) {
+      hex = hex.replace(/[^0-9A-Fa-f]/g, "");
+      if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
+      if (hex.length !== 6) return null;
+      return {
+        r: parseInt(hex.slice(0, 2), 16),
+        g: parseInt(hex.slice(2, 4), 16),
+        b: parseInt(hex.slice(4, 6), 16)
+      };
+    }
+
+    function refreshPickerUI() {
+      const hueRgb = hsvToRgb(cpH, 1, 1);
+      cpSvBox.style.backgroundColor = `rgb(${hueRgb.r}, ${hueRgb.g}, ${hueRgb.b})`;
+      cpSvCursor.style.left = `${cpS * 200}px`;
+      cpSvCursor.style.top = `${(1 - cpV) * 200}px`;
+      cpHueCursor.style.top = `${(cpH / 360) * 200}px`;
+
+      const { r, g, b } = hsvToRgb(cpH, cpS, cpV);
+      const hex = rgbToHex(r, g, b);
+      cpR.value = r;
+      cpG.value = g;
+      cpB.value = b;
+      cpHex.value = hex;
+
+      cpNoneSwatch.classList.toggle("active", cpIsNone);
+      cpPreviewBox.classList.toggle("is-none", cpIsNone);
+      if (!cpIsNone) {
+        cpPreviewBox.style.background = `#${hex}`;
+      }
+    }
+
+    function openColorPicker(targetKey) {
+      activeColorTarget = targetKey;
+      cpTitle.textContent = colorTitles[targetKey] || "Renk Seçici";
+      const currentVal = colorState[targetKey];
+      if (currentVal === "none") {
+        cpIsNone = true;
+        cpH = 0; cpS = 0; cpV = 1;
+      } else {
+        cpIsNone = false;
+        const rgb = hexToRgb(currentVal) || { r: 210, g: 40, b: 40 };
+        const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        cpH = hsv.h; cpS = hsv.s; cpV = hsv.v;
+      }
+      refreshPickerUI();
+      cpOverlay.classList.add("open");
+    }
+
+    // 2D SV Karesi Sürükleme
+    function handleSvMove(e) {
+      const rect = cpSvBox.getBoundingClientRect();
+      cpS = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      cpV = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
+      cpIsNone = false;
+      refreshPickerUI();
+    }
+    cpSvBox.onmousedown = (e) => {
+      handleSvMove(e);
+      const onMove = (ev) => handleSvMove(ev);
+      const onUp = () => { document.removeEventListener("mousemove", onMove); document.removeEventListener("mouseup", onUp); };
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    };
+
+    // Hue Çubuğu Sürükleme
+    function handleHueMove(e) {
+      const rect = cpHueBar.getBoundingClientRect();
+      cpH = Math.max(0, Math.min(359.9, ((e.clientY - rect.top) / rect.height) * 360));
+      cpIsNone = false;
+      refreshPickerUI();
+    }
+    cpHueBar.onmousedown = (e) => {
+      handleHueMove(e);
+      const onMove = (ev) => handleHueMove(ev);
+      const onUp = () => { document.removeEventListener("mousemove", onMove); document.removeEventListener("mouseup", onUp); };
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    };
+
+    // RGB ve HEX Manuel Girişleri
+    [cpR, cpG, cpB].forEach(inp => {
+      inp.oninput = () => {
+        const r = Math.max(0, Math.min(255, parseInt(cpR.value || 0, 10)));
+        const g = Math.max(0, Math.min(255, parseInt(cpG.value || 0, 10)));
+        const b = Math.max(0, Math.min(255, parseInt(cpB.value || 0, 10)));
+        const hsv = rgbToHsv(r, g, b);
+        cpH = hsv.h; cpS = hsv.s; cpV = hsv.v;
+        cpIsNone = false;
+        refreshPickerUI();
+      };
+    });
+
+    cpHex.oninput = () => {
+      const rgb = hexToRgb(cpHex.value);
+      if (rgb) {
+        const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+        cpH = hsv.h; cpS = hsv.s; cpV = hsv.v;
+        cpIsNone = false;
+        refreshPickerUI();
+      }
+    };
+
+    cpNoneSwatch.onclick = () => {
+      cpIsNone = !cpIsNone;
+      refreshPickerUI();
+    };
+
+    document.getElementById("cp-cancel").onclick = () => cpOverlay.classList.remove("open");
+    cpOverlay.onclick = (e) => { if (e.target === cpOverlay) cpOverlay.classList.remove("open"); };
+
+    document.getElementById("cp-ok").onclick = () => {
+      if (activeColorTarget) {
+        const { r, g, b } = hsvToRgb(cpH, cpS, cpV);
+        const newVal = cpIsNone ? "none" : `#${rgbToHex(r, g, b)}`;
+        colorState[activeColorTarget] = newVal;
+
+        const previewEl = document.getElementById(`preview-${activeColorTarget}`);
+        if (previewEl) {
+          previewEl.classList.toggle("is-none", newVal === "none");
+          if (newVal !== "none") previewEl.style.background = newVal;
+        }
+        updateStyles();
+      }
+      cpOverlay.classList.remove("open");
+    };
+
+    document.querySelectorAll(".swatch-btn").forEach(btn => {
+      btn.onclick = () => openColorPicker(btn.getAttribute("data-color-target"));
+    });
+
+    // =========================================================
+    // GİTHUB DİNAMİK SÜRÜM BİLGİSİ
+    // =========================================================
     (async function loadGitHubVersion() {
       const badge = document.getElementById("version-info");
       if (!badge) return;
-      const fileName = location.pathname.split("/").pop() || "dilsizDunyaHaritasi.html";
+      const fileName = location.pathname.split("/").pop() || "dilsizTurkiyeHaritasi.html";
       try {
         const res = await fetch(`https://api.github.com/repos/behiyegok/cografyacinincantasi/commits?path=${fileName}`);
         if (!res.ok) throw new Error();
@@ -391,11 +792,10 @@
           badge.textContent = `v1.${commits.length} • Son Güncelleme: ${formattedDate}`;
         }
       } catch {
-        badge.textContent = "v1.2 • Güncel Sürüm";
+        badge.textContent = "v1.4 • Güncel Sürüm";
       }
     })();
 
-    
     function getVisualCenter(key, geometry) {
       let targetPolygon = geometry.coordinates;
       if (geometry.type === "MultiPolygon") {
@@ -434,6 +834,24 @@
 
     function geoJsonToSvgPath(geometry) {
       let d = "";
+      if (geometry.type === "LineString") {
+        geometry.coordinates.forEach((coord, i) => {
+          const x = (coord[0] - 25.5) * 52;
+          const y = (42.5 - coord[1]) * 65;
+          d += i === 0 ? `M ${x.toFixed(2)} ${y.toFixed(2)}` : ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
+        });
+        return d;
+      }
+      if (geometry.type === "MultiLineString") {
+        geometry.coordinates.forEach(line => {
+          line.forEach((coord, i) => {
+            const x = (coord[0] - 25.5) * 52;
+            const y = (42.5 - coord[1]) * 65;
+            d += i === 0 ? `M ${x.toFixed(2)} ${y.toFixed(2)}` : ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
+          });
+        });
+        return d;
+      }
       const coords = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
       coords.forEach(polygon => {
         polygon.forEach(ring => {
@@ -448,35 +866,119 @@
       return d;
     }
 
+    // Türkiye Sınırları İçindeki Akarsu ve Gölleri Çekme ve Kırpma (ClipPath ile)
+    async function loadHydrologyData() {
+      if (hydrologyLoaded || !hydrologyGroup) return;
+      hydrologyLoaded = true;
+
+      const isInsideTurkeyBBox = (coords) => {
+        const flat = coords.flat(3);
+        for (let i = 0; i < flat.length; i += 2) {
+          const lon = flat[i];
+          const lat = flat[i + 1];
+          if (lon >= 25.5 && lon <= 45.0 && lat >= 35.7 && lat <= 42.2) return true;
+        }
+        return false;
+      };
+
+      try {
+        const [riversRes, lakesRes] = await Promise.all([
+          fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson"),
+          fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_lakes.geojson")
+        ]);
+
+        if (riversRes.ok) {
+          const riversData = await riversRes.json();
+          riversData.features.forEach(f => {
+            if (!f.geometry || !isInsideTurkeyBBox(f.geometry.coordinates)) return;
+            const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            p.setAttribute("d", geoJsonToSvgPath(f.geometry));
+            p.setAttribute("fill", "none");
+            p.setAttribute("stroke", colorState.water === "none" ? "none" : colorState.water);
+            p.setAttribute("stroke-width", "1.4");
+            p.setAttribute("class", "hydro-river");
+            hydrologyGroup.appendChild(p);
+          });
+        }
+
+        if (lakesRes.ok) {
+          const lakesData = await lakesRes.json();
+          lakesData.features.forEach(f => {
+            if (!f.geometry || !isInsideTurkeyBBox(f.geometry.coordinates)) return;
+            const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            p.setAttribute("d", geoJsonToSvgPath(f.geometry));
+            p.setAttribute("fill", colorState.water === "none" ? "none" : colorState.water);
+            p.setAttribute("stroke", colorState.water === "none" ? "none" : colorState.water);
+            p.setAttribute("stroke-width", "0.8");
+            p.setAttribute("class", "hydro-lake");
+            hydrologyGroup.appendChild(p);
+          });
+        }
+        updateStyles();
+      } catch (err) {
+        console.warn("Hidrografya verisi yüklenemedi:", err);
+      }
+    }
+
     function updateStyles() {
       if (!svgElement) return;
 
+      const defaultFill = colorState.base;
+      const boundaryCol = colorState.boundary;
+
       provinceMap.forEach((entry, key) => {
         const isSelected = selectedProvinceColors.has(key);
-        const fillColor = isSelected ? selectedProvinceColors.get(key) : basePicker.value;
+        const fillColor = isSelected ? selectedProvinceColors.get(key) : defaultFill;
 
         entry.path.setAttribute("fill", fillColor);
         
-        if (showBoundaries) {
-          entry.path.setAttribute("stroke", boundaryPicker.value);
+        if (showBoundaries && boundaryCol !== "none") {
+          entry.path.setAttribute("stroke", boundaryCol);
           entry.path.setAttribute("stroke-width", "1.2");
         } else {
-          entry.path.setAttribute("stroke", fillColor);
+          entry.path.setAttribute("stroke", fillColor === "none" ? "none" : fillColor);
           entry.path.setAttribute("stroke-width", "0.8");
+        }
+
+        if (entry.selectedNameText) {
+          entry.selectedNameText.style.display = isSelected ? "block" : "none";
         }
 
         entry.button.classList.toggle("is-selected", isSelected);
         const indicator = entry.button.querySelector(".province-color-indicator");
         if (indicator) {
-          indicator.style.background = fillColor;
+          indicator.classList.toggle("is-none", fillColor === "none");
+          indicator.style.background = fillColor === "none" ? "#ffffff" : fillColor;
         }
       });
 
+      // Hidrografya Rengi
+      if (hydrologyGroup) {
+        const wCol = colorState.water;
+        hydrologyGroup.querySelectorAll(".hydro-river").forEach(el => {
+          el.setAttribute("stroke", wCol);
+        });
+        hydrologyGroup.querySelectorAll(".hydro-lake").forEach(el => {
+          el.setAttribute("fill", wCol);
+          el.setAttribute("stroke", wCol);
+        });
+      }
+
+      // Tüm İl İsimleri Stili
       if (autoNamesGroup) {
-        const fontSize = nameSizeInput.value || 12;
+        const fontSize = nameSizeInput.value || 11;
         autoNamesGroup.querySelectorAll(".auto-province-name").forEach(el => {
-          el.setAttribute("fill", nameColorPicker.value);
+          el.setAttribute("fill", colorState.allNames);
           el.setAttribute("font-size", fontSize);
+        });
+      }
+
+      // Seçili İl İsimleri Stili
+      if (selectedNamesGroup) {
+        const selFontSize = selNameSizeInput.value || 12;
+        selectedNamesGroup.querySelectorAll(".selected-province-name").forEach(el => {
+          el.setAttribute("fill", colorState.selectedNames);
+          el.setAttribute("font-size", selFontSize);
         });
       }
 
@@ -487,7 +989,8 @@
       if (selectedProvinceColors.has(key)) {
         selectedProvinceColors.delete(key);
       } else {
-        selectedProvinceColors.set(key, selectedPicker.value);
+        // Seçim anındaki aktif "Seçili İl Rengi" (Renksiz dahil) bu ile atanır
+        selectedProvinceColors.set(key, colorState.selected);
       }
       updateStyles();
     }
@@ -501,22 +1004,55 @@
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svgElement = svg;
 
+        // Türkiye Sınır Maskesi (Akarsuların dışarı taşmasını kesmek için)
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        turkeyClipPath = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
+        turkeyClipPath.setAttribute("id", "turkey-clip");
+        defs.appendChild(turkeyClipPath);
+        svg.appendChild(defs);
+
+        // 1. Katman: İller
         pathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        pathGroup.setAttribute("id", "layer-provinces");
         svg.appendChild(pathGroup);
 
+        // 2. Katman: Akarsu & Göller (Türkiye Sınırlarına Kırpılmış)
+        hydrologyGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        hydrologyGroup.setAttribute("id", "layer-hydrology");
+        hydrologyGroup.setAttribute("class", "hydrology-layer");
+        hydrologyGroup.setAttribute("clip-path", "url(#turkey-clip)");
+        hydrologyGroup.style.display = "none";
+        svg.appendChild(hydrologyGroup);
+
+        // 3. Katman: Tüm İl İsimleri
         autoNamesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        autoNamesGroup.setAttribute("id", "layer-all-names");
         autoNamesGroup.style.display = "none";
         svg.appendChild(autoNamesGroup);
 
+        // 4. Katman: Seçili İl İsimleri
+        selectedNamesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        selectedNamesGroup.setAttribute("id", "layer-selected-names");
+        selectedNamesGroup.style.display = "none";
+        svg.appendChild(selectedNamesGroup);
+
+        // 5. Katman: Kullanıcı Metin ve Şekilleri
         labelGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        labelGroup.setAttribute("id", "layer-annotations");
         svg.appendChild(labelGroup);
 
         data.features.forEach(feature => {
           const name = feature.properties.name || feature.properties.NAME_1 || "İl";
           const key = trKey(name);
+          const dStr = geoJsonToSvgPath(feature.geometry);
+
+          // Sınır Maskesine İl Poligonunu Ekle
+          const clipPoly = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          clipPoly.setAttribute("d", dStr);
+          turkeyClipPath.appendChild(clipPoly);
 
           const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          path.setAttribute("d", geoJsonToSvgPath(feature.geometry));
+          path.setAttribute("d", dStr);
           path.setAttribute("data-name", name);
           path.setAttribute("data-key", key);
 
@@ -533,31 +1069,46 @@
 
           const center = getVisualCenter(key, feature.geometry);
 
+          // Tüm İller Etiketi
           const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
           nameText.setAttribute("class", "auto-province-name");
           nameText.setAttribute("x", center.x);
           nameText.setAttribute("y", center.y);
-          nameText.setAttribute("font-size", "12");
+          nameText.setAttribute("font-size", "11");
           nameText.setAttribute("text-anchor", "middle");
           nameText.setAttribute("dominant-baseline", "central");
-          nameText.setAttribute("fill", nameColorPicker.value);
+          nameText.setAttribute("fill", colorState.allNames);
           nameText.textContent = name;
-
           makeInteractive(nameText);
           autoNamesGroup.appendChild(nameText);
 
+          // Seçili İller Etiketi
+          const selNameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          selNameText.setAttribute("class", "selected-province-name");
+          selNameText.setAttribute("x", center.x);
+          selNameText.setAttribute("y", center.y);
+          selNameText.setAttribute("font-size", "12");
+          selNameText.setAttribute("text-anchor", "middle");
+          selNameText.setAttribute("dominant-baseline", "central");
+          selNameText.setAttribute("fill", colorState.selectedNames);
+          selNameText.style.display = "none";
+          selNameText.textContent = name;
+          makeInteractive(selNameText);
+          selectedNamesGroup.appendChild(selNameText);
+
           const btn = document.createElement("button");
           btn.className = "province-row";
-          btn.innerHTML = `<span>${name}</span> <span class="province-color-indicator" style="background:${basePicker.value}"></span>`;
+          btn.innerHTML = `<span>${name}</span> <span class="province-color-indicator" style="background:${colorState.base}"></span>`;
           btn.onclick = () => toggleProvince(key);
           listContainer.appendChild(btn);
 
-          provinceMap.set(key, { name, path, button: btn });
+          provinceMap.set(key, { name, path, button: btn, selectedNameText: selNameText });
         });
 
         container.appendChild(svg);
 
-        const bbox = svg.getBBox();
+        // Görünüm kutusunu yalnızca il sınırlarına göre hesapla
+        const bbox = pathGroup.getBBox();
         const pad = 15;
         initialViewBox = { x: bbox.x - pad, y: bbox.y - pad, w: bbox.width + (pad * 2), h: bbox.height + (pad * 2) };
         currentViewBox = { ...initialViewBox };
@@ -604,21 +1155,35 @@
       applyViewBox();
     };
 
-    toggleBoundaryBtn.onclick = () => {
-      showBoundaries = !showBoundaries;
-      toggleBoundaryBtn.textContent = showBoundaries ? "Sınırları Gizle" : "Sınırları Göster";
+    // Toggle Switch Olayları
+    toggleBoundarySwitch.onchange = () => {
+      showBoundaries = toggleBoundarySwitch.checked;
       updateStyles();
     };
 
-    toggleNamesBtn.onclick = () => {
-      showProvinceNames = !showProvinceNames;
+    toggleHydrologySwitch.onchange = async () => {
+      showHydrology = toggleHydrologySwitch.checked;
+      if (showHydrology && !hydrologyLoaded) {
+        await loadHydrologyData();
+      }
+      hydrologyGroup.style.display = showHydrology ? "block" : "none";
+    };
+
+    toggleNamesSwitch.onchange = () => {
+      showProvinceNames = toggleNamesSwitch.checked;
       autoNamesGroup.style.display = showProvinceNames ? "block" : "none";
-      toggleNamesBtn.textContent = showProvinceNames ? "İl İsimlerini Gizle" : "İl İsimlerini Göster";
+    };
+
+    toggleSelectedNamesSwitch.onchange = () => {
+      showSelectedNames = toggleSelectedNamesSwitch.checked;
+      selectedNamesGroup.style.display = showSelectedNames ? "block" : "none";
+      updateStyles();
     };
 
     // SÜRÜKLEME SİSTEMİ
     function makeInteractive(element) {
-      if (!element.classList.contains("auto-province-name")) {
+      const isProvinceLabel = element.classList.contains("auto-province-name") || element.classList.contains("selected-province-name");
+      if (!isProvinceLabel) {
         element.ondblclick = (e) => {
           e.stopPropagation();
           element.remove();
@@ -672,7 +1237,7 @@
       if (!text.trim() || !labelGroup) return;
 
       const size = labelSizeInput.value || 14;
-      const color = labelColorPicker.value || "#000000";
+      const color = colorState.label;
 
       const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
       textNode.setAttribute("class", "svg-interactive");
@@ -698,7 +1263,9 @@
       if (!labelGroup) return;
 
       const size = parseFloat(shapeSizeInput.value) || 14;
-      const color = shapeColorPicker.value || "#d22828";
+      const fillCol = colorState.shape;
+      const strokeCol = fillCol === "none" ? "#173047" : "none";
+      const strokeW = fillCol === "none" ? "1.5" : "0";
       const cx = currentViewBox.x + currentViewBox.w / 2;
       const cy = currentViewBox.y + currentViewBox.h / 2;
 
@@ -709,21 +1276,18 @@
         shapeNode.setAttribute("cx", cx);
         shapeNode.setAttribute("cy", cy);
         shapeNode.setAttribute("r", size / 2);
-        shapeNode.setAttribute("fill", color);
       } else if (type === "ellipse") {
         shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
         shapeNode.setAttribute("cx", cx);
         shapeNode.setAttribute("cy", cy);
         shapeNode.setAttribute("rx", size);
         shapeNode.setAttribute("ry", size / 2);
-        shapeNode.setAttribute("fill", color);
       } else if (type === "square") {
         shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         shapeNode.setAttribute("x", cx - size / 2);
         shapeNode.setAttribute("y", cy - size / 2);
         shapeNode.setAttribute("width", size);
         shapeNode.setAttribute("height", size);
-        shapeNode.setAttribute("fill", color);
         shapeNode.setAttribute("rx", "2");
       } else if (type === "triangle") {
         shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
@@ -732,7 +1296,6 @@
         const p2 = `${cx - r * 0.866},${cy + r * 0.5}`;
         const p3 = `${cx + r * 0.866},${cy + r * 0.5}`;
         shapeNode.setAttribute("points", `${p1} ${p2} ${p3}`);
-        shapeNode.setAttribute("fill", color);
       } else if (type === "pentagon") {
         shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
         let pts = [];
@@ -742,19 +1305,22 @@
           pts.push(`${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`);
         }
         shapeNode.setAttribute("points", pts.join(" "));
-        shapeNode.setAttribute("fill", color);
       } else if (type === "star") {
         shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
         shapeNode.setAttribute("x", cx);
         shapeNode.setAttribute("y", cy);
         shapeNode.setAttribute("font-size", size * 1.5);
-        shapeNode.setAttribute("fill", color);
         shapeNode.setAttribute("text-anchor", "middle");
         shapeNode.setAttribute("dominant-baseline", "central");
         shapeNode.textContent = "★";
       }
 
       if (shapeNode) {
+        shapeNode.setAttribute("fill", fillCol);
+        if (strokeCol !== "none") {
+          shapeNode.setAttribute("stroke", strokeCol);
+          shapeNode.setAttribute("stroke-width", strokeW);
+        }
         shapeNode.setAttribute("class", "svg-interactive");
         makeInteractive(shapeNode);
         labelGroup.appendChild(shapeNode);
@@ -794,7 +1360,7 @@
       cloneSvg.insertBefore(styleNode, cloneSvg.firstChild);
 
       const pad = 8;
-      const bbox = svgElement.getBBox();
+      const bbox = pathGroup.getBBox();
       const cropX = bbox.x - pad;
       const cropY = bbox.y - pad;
       const cropW = bbox.width + (pad * 2);
@@ -837,7 +1403,7 @@
       cloneSvg.insertBefore(styleNode, cloneSvg.firstChild);
       
       const pad = 8;
-      const bbox = svgElement.getBBox();
+      const bbox = pathGroup.getBBox();
       const cropX = bbox.x - pad;
       const cropY = bbox.y - pad;
       const cropW = bbox.width + (pad * 2);
@@ -898,11 +1464,8 @@
       img.src = url;
     }
 
-    basePicker.oninput = updateStyles;
-    selectedPicker.oninput = updateStyles;
-    boundaryPicker.oninput = updateStyles;
-    nameColorPicker.oninput = updateStyles;
     nameSizeInput.oninput = updateStyles;
+    selNameSizeInput.oninput = updateStyles;
 
     document.getElementById("download-png").onclick = () => exportImage("png");
     document.getElementById("download-jpeg").onclick = () => exportImage("jpeg");
